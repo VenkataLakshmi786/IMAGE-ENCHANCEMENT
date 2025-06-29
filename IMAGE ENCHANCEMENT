@@ -1,0 +1,57 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+from google.colab import files
+uploaded = files.upload()
+
+import io
+from PIL import Image
+
+image_path = list(uploaded.keys())[0]
+img = cv2.imread(image_path)
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+plt.imshow(img)
+plt.title("Original Image")
+plt.axis("off")
+plt.show()
+gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+plt.imshow(gray, cmap='gray')
+plt.title("Grayscale Image")
+plt.axis("off")
+plt.show()
+hist_eq = cv2.equalizeHist(gray)
+plt.imshow(hist_eq, cmap='gray')
+plt.title("Histogram Equalized")
+plt.axis("off")
+plt.show()
+#Contrast Limited Adaptive Histogram Equalization
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+clahe_eq = clahe.apply(gray)
+plt.imshow(clahe_eq, cmap='gray')
+plt.title("CLAHE Result")
+plt.axis("off")
+plt.show()
+#Gamma Correction
+gamma = 1.5
+invGamma = 1.0 / gamma
+table = np.array([(i / 255.0) ** invGamma * 255 for i in np.arange(0, 256)]).astype("uint8")
+gamma_corrected = cv2.LUT(img, table)
+
+plt.imshow(gamma_corrected)
+plt.title("Gamma Corrected Image")
+plt.axis("off")
+plt.show()
+gaussian = cv2.GaussianBlur(img, (7, 7), 0)
+plt.imshow(gaussian)
+plt.title("Gaussian Smoothing")
+plt.axis("off")
+plt.show()
+gaussian_blur = cv2.GaussianBlur(img, (9, 9), 10.0)
+unsharp_image = cv2.addWeighted(img, 1.5, gaussian_blur, -0.5, 0)
+
+plt.imshow(unsharp_image)
+plt.title("Unsharp Mask (Sharpened Image)")
+plt.axis("off")
+plt.show()
